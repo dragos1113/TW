@@ -1,0 +1,326 @@
+1 si 3.
+
+-deschid pgAdmin
+-click dreapta pe databases:Create
+-pun doar nume si save
+-apas sus de tot langa object explorer pe primul buton(Query Tool)
+-copy paste la :
+	create table if not exists elevi (
+	id serial primary key,
+	nume varchar(100) not null,
+	prenume varchar(100) not null,
+	clasa varchar(4),
+	note varchar(50),
+	data_adaugarii timestamp default current_timestamp
+);
+
+INSERT INTO elevi (nume, prenume, clasa, note) VALUES 
+('Ionescu', 'Gigel', '9F', '10,8,5,7'),
+('Popescu', 'Dorel', '9F', '10,8,10,10'),
+('Bumbulescu', 'Monica', '9B', '10,9,10,7'),
+('Escu', 'Costica', '9F', '10,4,5,7,5'),
+('Tache', 'Ionel', '9A', '9,10,6,10,9'),
+('Mache', 'Gigel', '9F', '10,10,10,10'),
+('Ionescu', 'Ana', '9F', '10,9,9,9,9'),
+('Gogu', 'Oana', '9F', '10,9,8,10'),
+('Lache', 'Dana', '9A', '4,5,5,7'),
+('Ionescu', 'Hana', '9F', '3,8,1,2,3'),
+('Bubu', 'Leana', '9A', '9,10,10'),
+('Popescu', 'Teodor', '9C', '1,2,3,4,5'),
+('Ionescu', 'Tudorel', '9C', '6,7,8,9,10'),
+('Costescu', 'Bob', '9D', '5,5,5'),
+('Petrescu', 'Petre', '9F', '7,9,2,10,9,1,10'),
+('Mihailescu', 'Gigel', '9D', '10');
+
+create user fabian with encrypted password '123456';
+grant all privileges on database model to fabian;
+grant all privileges on all tables in schema public to fabian;
+grant all privileges on all sequences in schema public to fabian;
+
+
+
+-in index.js copy paste la astea(sunt mereu la fel)
+const express = require("express")
+const fs = require("fs")
+const path = require("path");
+const {Client} = require("pg");
+
+var client = new Client(
+{
+    database: "pregatire",
+    user: "dragos69",
+    password: "123456",
+    host: "localhost",
+    port: 5432
+});
+
+
+client.connect();
+
+app = express();
+
+app.set("view engine", "ejs");
+
+app.use("/resurse", express.static(__dirname + "/resurse"));
+
+
+
+
+app.listen(8080);
+console.log("Serverul a pornit");
+
+
+
+
+
+-astea sunt in functie de cerinta
+
+app.get("/elevi", function(req, res)
+{
+    client.query('select * from elevi', function(err, db_res)
+    {
+        if(!err)
+        {
+            let elevi = [];
+
+            if (req.query.id)
+            {
+                let ids = new Set(req.query.id.split(' ').map(id => parseInt(id)));
+
+                for (let elev of db_res.rows)
+                    if (ids.has(elev.id))
+                        elevi.push(elev)
+            }
+            else
+                elevi = db_res.rows;
+
+            for (let elev of elevi)
+            {
+                let note = elev.note.split(',').map(nota => parseInt(nota.trim()));
+                let medie = note.reduce((acc, nota) => acc + nota, 0) / note.length;
+
+                elev.note = note;
+                elev.medie = medie;
+            }
+
+            res.render("elevi", {elevi: elevi});
+        }
+        else
+            console.log(err);
+    });
+})
+
+
+
+-pun in elevi.ejs asta(contine si filtrarea si sortarea pentru ex3)
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+<!DOCTYPE html>
+
+<html lang="ro">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Model</title>
+        <meta name="author" content="Stroescu Dragos">
+        <link rel="stylesheet" href="/resurse/css/stil.css">
+    </head>
+
+    <body>
+        <main>
+
+            <div style="margin-top: 20px; margin-left: 20px">
+                <div style="margin-bottom: 20px;">
+                    <p style="display: inline;">Numar de filtrari/sortari: </p>
+                    <p id="nr" style="display: inline;"></p>
+                    <button onclick="reseteaza();" style="margin-left: 20px; display: inline;">Reseteaza</button>
+                </div>
+                <div style="margin-bottom: 20px">
+                    <select id="sort">
+                        <option>Ascendent</option>
+                        <option>Descendent</option>
+                    </select>
+                    <button onclick="sorteaza();">Sorteaza</button>
+                </div>
+                <div style="margin-bottom: 20px">
+                    <input id="filter" type="text" placeholder="Filtreaza dupa nume">
+                    <button onclick="filtreaza();">Filtreaza</button>
+                </div>
+            </div>
+            <div class="elevi">
+                <% for (let elev of elevi) { %>
+                    <article class="elev" medie="<%= elev.medie %>" nume="<%= elev.nume %>">
+                        <h2 class="nume">
+                            <%= elev.nume %>
+                                <%= elev.prenume %>
+                        </h2>
+                        <p>Note: </p>
+                        <ul>
+                            <% for (let nota of elev.note) { %>
+                                <li class="nota">
+                                    <%= nota %>
+                                </li>
+                                <% } %>
+                        </ul>
+                        <p class="medie">
+                            Medie: <%= elev.medie.toFixed(2) %>
+                        </p>
+                    </article>
+                    <% } %>
+            </div>
+        </main>
+    </body>
+    <script>
+        function sorteaza() {
+
+
+            let elevi = document.getElementsByClassName('elev');
+            let sort = document.getElementById('sort').selectedIndex;
+
+            items = Array.from(elevi);
+
+            if (sort == 0)
+                items.sort(function (a, b) {
+
+                    let ma = Number(a.getAttribute('medie'));
+                    let mb = Number(b.getAttribute('medie'));
+
+                    if (ma == mb)
+                        return a.getAttribute('nume').localeCompare(b.getAttribute('nume'));
+
+                    return ma - mb;
+                });
+            else if (sort == 1)
+                items.sort(function (a, b) {
+
+                    let ma = Number(a.getAttribute('medie'));
+                    let mb = Number(b.getAttribute('medie'));
+
+                    if (ma == mb)
+                        return a.getAttribute('nume').localeCompare(b.getAttribute('nume'));
+
+                    return mb - ma;
+                });
+
+            let container = document.getElementsByClassName('elevi')[0];
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                container.appendChild(item);
+            });
+
+        }
+
+        function filtreaza() {
+
+
+            let filter = document.getElementById('filter').value;
+            let elevi = document.getElementsByClassName('elev');
+
+            for (let elev of elevi) {
+                let show = true;
+
+
+                //aici poate sa difere, in rest e la fel
+                if (filter.trim().length > 0 && !elev.children[0].textContent.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
+                    show = false;
+
+
+
+                if (show)
+                    elev.style.display = 'block';
+                else
+                    elev.style.display = 'none';
+            }
+
+        }
+
+
+    </script>
+
+</html>
+
+
+
+2.
+
+copy paste in stil.css:
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+
+:root
+{
+    --c1: rgb(255, 198, 198);
+    --c2: rgb(213, 255, 213);
+    --c3: rgb(210, 210, 255);
+}
+
+.elevi
+{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 10px;
+    counter-reset: elevi;
+}
+
+.elevi .elev
+{
+    padding: 20px;
+    border-radius: 10px;
+    background: var(--c1);
+    outline: 5px solid rgba(0, 0, 0, 0.1);
+    outline-offset: -5px;
+    counter-increment: elevi;
+}
+
+.elevi .elev:nth-child(9n + 2),
+.elev:nth-child(9n + 4),
+.elev:nth-child(9n + 6),
+.elev:nth-child(9n + 8)
+{
+    background: var(--c2);
+}
+
+.elevi .elev:nth-child(9n+1)
+{
+    background: var(--c3);
+}
+
+.elevi .elev:nth-child(9n+9)
+{
+    background: var(--c3);
+}
+
+.nume::before
+{
+    content: counter(elevi) '. ';
+}
+
+@media (max-width: 1200px)
+{
+    .elevi
+    {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.medie
+{
+    width: fit-content;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.elev .medie
+{
+    transition: background 0.5s, transform 0.5s;
+}
+
+.elev:hover .medie
+{
+    background: rgb(99, 192, 99);
+    transform: translateY(-5px);
+}
