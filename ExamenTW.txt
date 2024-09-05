@@ -14,6 +14,17 @@
 	data_adaugarii timestamp default current_timestamp
 );
 
+
+PENTRU TIPURI DE DATE CUSTOM:
+
+drop type if exists categ_produs;
+drop type if exists tip_produs;
+drop type if exists tip_stoc;
+
+create type categ_produs as enum('Procesor', 'Placă video', 'Placă de bază', 'Memorie RAM', 'SSD', 'Hard disk', 'Sursă', 'Carcasă', 'Cooler', 'Mouse', 'Tastatură', 'Căști', 'Monitor');
+create type tip_produs as enum('componente', 'periferice', 'altele');
+create type tip_stoc as enum('suficient', 'limitat', 'epuizat');
+
 INSERT INTO elevi (nume, prenume, clasa, note) VALUES 
 ('Ionescu', 'Gigel', '9F', '10,8,5,7'),
 ('Popescu', 'Dorel', '9F', '10,8,10,10'),
