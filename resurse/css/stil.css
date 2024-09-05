@@ -1,0 +1,74 @@
+:root
+{
+    --c1: rgb(255, 198, 198);
+    --c2: rgb(213, 255, 213);
+    --c3: rgb(210, 210, 255);
+}
+
+.elevi
+{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 10px;
+    counter-reset: elevi;
+}
+
+.elevi .elev
+{
+    padding: 20px;
+    border-radius: 10px;
+    background: var(--c1);
+    outline: 5px solid rgba(0, 0, 0, 0.1);
+    outline-offset: -5px;
+    counter-increment: elevi;
+}
+
+.elevi .elev:nth-child(9n + 2),
+.elev:nth-child(9n + 4),
+.elev:nth-child(9n + 6),
+.elev:nth-child(9n + 8)
+{
+    background: var(--c2);
+}
+
+.elevi .elev:nth-child(9n+1)
+{
+    background: var(--c3);
+}
+
+.elevi .elev:nth-child(9n+9)
+{
+    background: var(--c3);
+}
+
+.nume::before
+{
+    content: counter(elevi) '. ';
+}
+
+@media (max-width: 1200px)
+{
+    .elevi
+    {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.medie
+{
+    width: fit-content;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.elev .medie
+{
+    transition: background 0.5s, transform 0.5s;
+}
+
+.elev:hover .medie
+{
+    background: rgb(99, 192, 99);
+    transform: translateY(-5px);
+}

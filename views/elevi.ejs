@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="ro">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Model</title>
+        <meta name="author" content="Dumitru Fabian">
+        <link rel="stylesheet" href="/resurse/css/stil.css">
+    </head>
+
+    <body>
+        <main>
+
+            <div style="margin-top: 20px; margin-left: 20px">
+                <div style="margin-bottom: 20px;">
+                    <p style="display: inline;">Numar de filtrari/sortari: </p>
+                    <p id="nr" style="display: inline;"></p>
+                    <button onclick="reseteaza();" style="margin-left: 20px; display: inline;">Reseteaza</button>
+                </div>
+                <div style="margin-bottom: 20px">
+                    <select id="sort">
+                        <option>Ascendent</option>
+                        <option>Descendent</option>
+                    </select>
+                    <button onclick="sorteaza();">Sorteaza</button>
+                </div>
+                <div style="margin-bottom: 20px">
+                    <input id="filter" type="text" placeholder="Filtreaza dupa nume">
+                    <button onclick="filtreaza();">Filtreaza</button>
+                </div>
+            </div>
+            <div class="elevi">
+                <% for (let elev of elevi) { %>
+                    <article class="elev" medie="<%= elev.medie %>" nume="<%= elev.nume %>">
+                        <h2 class="nume">
+                            <%= elev.nume %>
+                                <%= elev.prenume %>
+                        </h2>
+                        <p>Note: </p>
+                        <ul>
+                            <% for (let nota of elev.note) { %>
+                                <li class="nota">
+                                    <%= nota %>
+                                </li>
+                                <% } %>
+                        </ul>
+                        <p class="medie">
+                            Medie: <%= elev.medie.toFixed(2) %>
+                        </p>
+                    </article>
+                    <% } %>
+            </div>
+        </main>
+    </body>
+    <script>
+        function sorteaza() {
+
+            if (getCookie('last') !== '') {
+                alert("Nu au trecut 7 secunde");
+                return;
+            }
+
+            let elevi = document.getElementsByClassName('elev');
+            let sort = document.getElementById('sort').selectedIndex;
+
+            items = Array.from(elevi);
+
+            if (sort == 0)
+                items.sort(function (a, b) {
+
+                    let ma = Number(a.getAttribute('medie'));
+                    let mb = Number(b.getAttribute('medie'));
+
+                    if (ma == mb)
+                        return a.getAttribute('nume').localeCompare(b.getAttribute('nume'));
+
+                    return ma - mb;
+                });
+            else if (sort == 1)
+                items.sort(function (a, b) {
+
+                    let ma = Number(a.getAttribute('medie'));
+                    let mb = Number(b.getAttribute('medie'));
+
+                    if (ma == mb)
+                        return a.getAttribute('nume').localeCompare(b.getAttribute('nume'));
+
+                    return mb - ma;
+                });
+
+            let container = document.getElementsByClassName('elevi')[0];
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                container.appendChild(item);
+            });
+
+            incNr();
+            updateNr();
+
+            setCookie('last', Date.now().toString(), 7000);
+            setTimeout(window.location.reload.bind(window.location), 7000);
+        }
+
+        function filtreaza() {
+
+            if (getCookie('last') !== '') {
+                alert("Nu au trecut 7 secunde");
+                return;
+            }
+
+            let filter = document.getElementById('filter').value;
+            let elevi = document.getElementsByClassName('elev');
+
+            for (let elev of elevi) {
+                let show = true;
+
+
+                //aici poate sa difere, in rest e la fel
+                if (filter.trim().length > 0 && !elev.children[0].textContent.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
+                    show = false;
+
+
+
+                if (show)
+                    elev.style.display = 'block';
+                else
+                    elev.style.display = 'none';
+            }
+
+            incNr();
+            updateNr();
+
+            setCookie('last', Date.now().toString(), 7000);
+            setTimeout(window.location.reload.bind(window.location), 7000);
+        }
+
+        function reseteaza() {
+            localStorage.setItem('nr', '0');
+            updateNr();
+        }
+
+        function incNr() {
+            let nr = localStorage.getItem('nr') || '0';
+            localStorage.setItem('nr', (parseInt(nr) + 1).toString());
+        }
+
+        function updateNr() {
+            let nrElem = document.getElementById('nr');
+            let nr = localStorage.getItem('nr') || '0';
+
+            nrElem.textContent = nr;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            updateNr();
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === '+')
+                    Array.from(document.getElementsByClassName('nota')).map(nota => nota.textContent = '10');
+            });
+        });
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+
+                while (c.charAt(0) == ' ')
+                    c = c.substring(1);
+
+                if (c.indexOf(name) == 0)
+                    return c.substring(name.length, c.length);
+            }
+
+            return "";
+        }
+
+        function setCookie(cname, cvalue, ms) {
+            const d = new Date();
+            d.setTime(d.getTime() + ms);
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+    </script>
+
+</html>
