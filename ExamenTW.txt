@@ -73,7 +73,9 @@ console.log("Serverul a pornit");
 
 
 
--astea sunt in functie de cerinta
+-astea sunt in functie de cerinta (Să se insereze elevii din "anexe" în tabel. Să se realizeze o pagină (/elevi) care afișează toți elevii în următorul format:
+Datele fiecărui elev vor fi puse într-un articol. Numele și prenumele vor fi puse într-un heading de nivel 2, clasa într-un paragraf iar notele într-o listă neordonată. Sub lista neordonata se va mai afișa un paragraf cu media notelor.
+Pagina se poate accesa și cu /elevi urmat de stringul ?id= urmat de un set de id-uri separate cu  caracterul + ca în exemplu: /elevi?id=3+5+7 caz în care va afișa în pagină doar elevii cu acele id-uri.)
 
 app.get("/elevi", function(req, res)
 {
@@ -112,7 +114,7 @@ app.get("/elevi", function(req, res)
 
 
 
--pun in elevi.ejs asta(contine si filtrarea si sortarea pentru ex3)
+-pun in elevi.ejs asta(contine si filtrarea si sortarea pentru ex3 : în pagină va exista un select cu valorile "ascendent, descendent" și lăngă el un buton cu textul sortează, care va sorta elevii (ascendent sau descendent în funcție de selecție) după medie, iar dacă mediile sunt egale, după nume. De asemenea va fi un input de tip text și un buton filtrează, care va afișa doar elevii al căror nume sau prenume conține textul din input (verificarea nu este case sensitive. (de exemplu, dacă în input avem textul "au", printre elevii selectați vor fi și "Aurel Popescu" dar și "Ion Nicolau". La apasarea tastei +, toate notele elevilor devin 10 (doar in pagina, nu si in baza de date).)
 
 
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -244,6 +246,8 @@ app.get("/elevi", function(req, res)
 
 
 2.
+Să se stilizeze pagina astfel: elevii să fie așezați într-un grid css de 3 coloane (de dimensiunie egale, cu spațiu între coloane de 10px, pentru care backgroundul celulelor urmează următorul pattern, din 3 în 3 rânduri (nu e obligatoriu să folosiți aceleași culori), deci patternul se repetă după fiecare 9 celule din grid:Celulele din grid vor fi numerotate cu ajutorul unui counter CSS, astfel fiind vizibil numărul de ordine al fiecărui elev. Atunci când se redimensionează pagina pentru ecran mediu, celule din grid vor fi așezate pe două coloane de dimensiuni egale.
+În lista de note, când venim cu cursorul pe articolul unui elev (deci oriunde pe articol, nu doar pe medie), să coloreze backgroundul mediei în mod treptat de la transparent în verde pe parcursul a 2 secunde, și să se ridice textul cu 5px. 
 
 copy paste in stil.css:
 
