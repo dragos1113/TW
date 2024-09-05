@@ -49,7 +49,7 @@ grant all privileges on all tables in schema public to fabian;
 grant all privileges on all sequences in schema public to fabian;
 
 
-
+-rulat npm install, npm init, npm install require
 -in index.js copy paste la astea(sunt mereu la fel)
 const express = require("express")
 const fs = require("fs")
@@ -81,8 +81,7 @@ app.listen(8080);
 console.log("Serverul a pornit");
 
 
-
-
+------------------------------------------------------------------------------------------
 
 -astea sunt in functie de cerinta (Să se insereze elevii din "anexe" în tabel. Să se realizeze o pagină (/elevi) care afișează toți elevii în următorul format:
 Datele fiecărui elev vor fi puse într-un articol. Numele și prenumele vor fi puse într-un heading de nivel 2, clasa într-un paragraf iar notele într-o listă neordonată. Sub lista neordonata se va mai afișa un paragraf cu media notelor.
